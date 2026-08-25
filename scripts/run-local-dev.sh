@@ -499,7 +499,7 @@ bootstrap_prepare_cassandra_config() {
 bootstrap_cqlsh_show_version() {
   PATH="$(bootstrap_java_bin_dir):$(dirname "$BOOTSTRAP_NODE_BIN"):$PATH" \
     CQLSH_PYTHON="$(command -v python3.11 2>/dev/null || command -v python3 2>/dev/null)" \
-    "$1" "$BOOTSTRAP_CASSANDRA_HOST" "$BOOTSTRAP_CASSANDRA_PORT" -e "SHOW VERSION" 2>&1
+    timeout 10 "$1" "$BOOTSTRAP_CASSANDRA_HOST" "$BOOTSTRAP_CASSANDRA_PORT" -e "SHOW VERSION" 2>&1
 }
 
 bootstrap_wait_for_cassandra() {
@@ -586,7 +586,7 @@ bootstrap_start_cassandra_for_session() {
   bootstrap_log "Cassandra started in the background with pid $BOOTSTRAP_CASSANDRA_PID"
   bootstrap_log "Waiting for Cassandra to accept connections on $BOOTSTRAP_CASSANDRA_HOST:$BOOTSTRAP_CASSANDRA_PORT"
 
-  version_output="$(bootstrap_wait_for_cassandra "$BOOTSTRAP_CQLSH_BIN" 120 || true)"
+  version_output="$(bootstrap_wait_for_cassandra "$BOOTSTRAP_CQLSH_BIN" 300 || true)"
   if [ -z "$version_output" ]; then
     tail -n 120 "$BOOTSTRAP_RUN_DIR/cassandra.log" >&2 || true
     bootstrap_fail "Cassandra did not become ready. See $BOOTSTRAP_RUN_DIR/cassandra.log."
