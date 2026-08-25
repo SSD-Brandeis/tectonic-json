@@ -1,3 +1,76 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:4ffa836c7d8c675517d5e3efe7ee5bf5cd632f90514c2890dcce467071f3143c
-size 1741
+{
+  "$schema": "../workload_schema.json",
+  "sections": [
+    {
+      "groups": [
+        {
+          "name": "Load Phase",
+          "enable_granular_stats": true,
+          "inserts": {
+            "op_count": 1000000,
+            "key": {
+              "segmented": {
+                "segments": [
+                  "usertable:user",
+                  {
+                    "uniform": {
+                      "len": 19,
+                      "character_set": "numeric"
+                    }
+                  }
+                ],
+                "separator": ""
+              }
+            },
+            "val": {
+              "uniform": {
+                "len": 1024
+              }
+            }
+          }
+        },
+        {
+          "name": "Execution Phase",
+          "enable_granular_stats": true,
+          "range_queries": {
+            "op_count": 950000,
+            "scan_length": {
+              "uniform": {
+                "min": 1,
+                "max": 101
+              }
+            },
+            "selection": {
+              "zipf": {
+                "s": 0.99,
+                "n": 1050000
+              }
+            }
+          },
+          "inserts": {
+            "op_count": 50000,
+            "key": {
+              "segmented": {
+                "segments": [
+                  "usertable:user",
+                  {
+                    "uniform": {
+                      "len": 19,
+                      "character_set": "numeric"
+                    }
+                  }
+                ],
+                "separator": ""
+              }
+            },
+            "val": {
+              "uniform": {
+                "len": 1024
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
